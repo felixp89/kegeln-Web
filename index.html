@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taktik Zentrale</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Taktik">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f3d2e">
+
+<style>
+:root{--bg:#f2f5f3;--card:#fff;--fg:#14201a;--mut:#6b7a72;--ac:#1f7a45;--ac2:#33b36b;--bd:#e2e8e4;--chip:#e8f0eb;--bad:#d4543f;--sh:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(15,61,46,.08)}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1310;--card:#16201a;--fg:#e9f2ec;--mut:#8da197;--ac:#3fbf74;--ac2:#2a9d5c;--bd:#243029;--chip:#1e2b24;--bad:#e0705c;--sh:0 1px 2px rgba(0,0,0,.4)}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+.bar{background:linear-gradient(135deg,#0f3d2e,#1f7a45);color:#fff;padding:calc(env(safe-area-inset-top,0px) + 18px) 18px 22px;border-radius:0 0 26px 26px;display:flex;align-items:center;gap:10px}
+.bar .t{flex:1;min-width:0}.bar h1{font-size:1.35rem;margin:0;font-weight:750;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar small{opacity:.8;font-size:.82rem}
+.ib{width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:19px;padding:0;cursor:pointer}
+.ib:active{background:rgba(255,255,255,.3)}
+.wrap{padding:0 14px 28px}.card{background:var(--card);border-radius:20px;padding:16px;margin-top:14px;box-shadow:var(--sh)}
+.card>h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:0 0 10px;font-weight:700;display:flex;justify-content:space-between}
+select,input[type=text]{width:100%;padding:13px 14px;border:1px solid var(--bd);border-radius:13px;background:var(--bg);color:var(--fg);font:inherit;outline:none}
+select:focus,input[type=text]:focus{border-color:var(--ac)}#gk select{margin-top:8px}
+.seg{display:flex;background:var(--chip);border-radius:14px;padding:4px}.seg label{flex:1}.seg input{display:none}
+.seg span{display:block;text-align:center;padding:10px;border-radius:11px;font-weight:600;color:var(--mut)}
+.seg input:checked+span{background:var(--card);color:var(--fg);box-shadow:var(--sh)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip input{display:none}
+.chip span{display:block;padding:9px 14px;border-radius:999px;background:var(--chip);border:1px solid var(--bd);font-size:.92rem;transition:.12s}
+.chip input:checked+span{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+button{font:inherit;border:0;cursor:pointer}
+.p{width:100%;padding:15px;border-radius:15px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-weight:700;font-size:1.02rem;box-shadow:0 6px 16px rgba(31,122,69,.35)}
+.p:disabled{opacity:.6}.s{padding:12px 16px;border-radius:13px;background:var(--chip);color:var(--fg);font-weight:600}
+.row{display:flex;gap:8px;margin-top:10px}.row input{flex:1}.msg{margin-top:10px;color:var(--bad);min-height:1em;font-size:.92rem}.mut{color:var(--mut)}
+details{margin-top:10px;font-size:.9rem}summary{cursor:pointer}
+.dock{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom,0px));padding:10px 14px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#plan{padding-bottom:84px}
+.sum{text-align:center;background:linear-gradient(135deg,#0f3d2e,#1f7a45);color:#fff;border-radius:20px;padding:18px;margin-top:14px;box-shadow:var(--sh)}
+.sum small{opacity:.8}.sum .score{font-size:2.6rem;font-weight:800;letter-spacing:1px;line-height:1.15}
+.pos{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:12px;margin-top:10px;box-shadow:var(--sh);border-left:5px solid var(--bad)}
+.pos.win{border-left-color:var(--ac2)}.pos .n{width:30px;height:30px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:700;flex:none}
+.pos .who{flex:1;min-width:0}.pos .who b,.pos .vs b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pos small{color:var(--mut);display:block}.pos .vs{width:47%;text-align:right;min-width:0}
+#plan{padding-bottom:150px}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+.nav button{flex:1;background:none;color:var(--mut);padding:9px 0 8px;font-size:.78rem;font-weight:600;border-radius:0;margin:0}
+.nav button b{display:block;font-size:1.3rem;line-height:1.1}.nav button.on{color:var(--ac)}
+.trow{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;background:var(--card);border-radius:16px;padding:12px;margin-top:10px;box-shadow:var(--sh)}
+.trow.me{outline:2px solid var(--ac2)}.trow .pl{font-weight:800;color:var(--mut);font-size:1.1rem}
+.trow b{display:block}.trow small{color:var(--mut)}.trow .r{text-align:right}.trow .r b{font-size:1.05rem}
+.mode-lic .lnk,.mode-demo .lnk{display:none}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--chip);color:var(--ac);font-weight:700;font-size:.8rem}
+#intro{position:fixed;inset:0;z-index:999;background:radial-gradient(circle at 50% 28%,#1f7a45,#0a2a1f 72%);display:grid;place-items:center;transition:opacity .4s;overflow:hidden}
+#intro.out{opacity:0;pointer-events:none}
+#intro svg{width:100%;height:100%;overflow:visible;animation:shake .4s 1.4s}
+#intro svg *{transform-box:fill-box;transform-origin:center}
+#intro .pin{animation:fall .95s cubic-bezier(.15,.7,.3,1) forwards;animation-delay:calc(1.35s + var(--d))}
+#intro #ball{animation:roll 1.1s cubic-bezier(.45,0,.9,.7) .3s both,through .5s ease-out 1.4s forwards}
+#intro #ring{animation:ring .55s ease-out 1.4s both}
+#intro .it{position:absolute;left:0;right:0;bottom:15%;text-align:center;color:#fff;animation:pop .6s cubic-bezier(.2,1.4,.4,1) 1.9s both}
+#intro .it b{display:block;font-size:2.3rem;letter-spacing:.06em;text-shadow:0 4px 18px rgba(0,0,0,.45)}
+#intro .it span{display:block;opacity:.85;margin-top:4px;letter-spacing:.12em;text-transform:uppercase;font-size:.85rem}
+@keyframes roll{from{transform:translateY(0) scale(1.9)}to{transform:translateY(-104px) scale(1)}}
+@keyframes through{from{transform:translateY(-104px) scale(1);opacity:1}to{transform:translateY(-132px) scale(.7);opacity:0}}
+@keyframes fall{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r)) scale(1.5,.7);opacity:.55}}
+@keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(9);opacity:0}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,-1px)}}
+@media (prefers-reduced-motion:reduce){#intro{display:none}}
+.hp{margin-top:8px;font-size:.92rem}.hp p{margin:9px 0}.hp ol{padding-left:20px;margin:6px 0}.hp li{margin:9px 0}summary{padding:6px 0}
+input[type=number]{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--fg);font:inherit;outline:none}
+.opt{margin:12px 0 4px}.opt label.t{display:block;font-size:.88rem;margin-bottom:4px}
+.opt h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:18px 0 4px}
+.opt .cb{display:flex;gap:10px;align-items:center;font-size:.9rem}.opt .cb input{width:22px;height:22px}
+.chip2{display:inline-block;padding:1px 9px;border-radius:999px;font-size:.74rem;font-weight:700;background:var(--chip);color:var(--ac);margin-left:6px}
+.chip2.w{color:var(--bad)}.trow.alt{opacity:.55}.trow .dt{font-size:.82rem;color:var(--mut);line-height:1.25}
+.trow a{color:var(--ac);font-weight:600;text-decoration:none}
+.nxt{background:linear-gradient(135deg,#0f3d2e,#1f7a45);color:#fff;border-radius:20px;padding:16px;margin-top:12px}.nxt small{opacity:.8}.nxt b{display:block;font-size:1.1rem;margin:2px 0}.nxt a{color:#fff;text-decoration:underline}
+.trow.ansr{display:block}.trow.ansr .dt{font-size:.85rem;color:var(--fg)}.trow.ansr .dt b{display:inline}
+input[type=date],input[type=time]{width:100%;min-width:0;padding:12px;border:1px solid var(--bd);border-radius:13px;background:var(--bg);color:var(--fg);font:inherit;outline:none}
+</style></head><body>
+
+<div id="intro">
+  <svg viewBox="0 0 108 150" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <defs><linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cf9a55"/><stop offset=".5" stop-color="#ebc48c"/><stop offset="1" stop-color="#cf9a55"/></linearGradient></defs>
+    <polygon points="44,20 64,20 98,300 10,300" fill="url(#wood)"/>
+    <polyline points="44,20 10,300" fill="none" stroke="#5b3a18" stroke-width="1.4"/><polyline points="64,20 98,300" fill="none" stroke="#5b3a18" stroke-width="1.4"/>
+    <g class="pin" style="--dx:1.2px;--dy:-10.8px;--r:-296deg;--d:0s"><circle cx="54" cy="51" r="2.4" fill="#fff" stroke="#9c6b34" stroke-width=".5"/><circle cx="54" cy="51" r="1.05" fill="#e4e4e4"/></g><g class="pin" style="--dx:-3.6px;--dy:-16.8px;--r:-309deg;--d:0.05s"><circle cx="50" cy="46" r="2.4" fill="#fff" stroke="#9c6b34" stroke-width=".5"/><circle cx="50" cy="46" r="1.05" fill="#e4e4e4"/></g><g class="pin" style="--dx:2.5px;--dy:-15.2px;--r:-200deg;--d:0.05s"><circle cx="58" cy="46" r="2.4" fill="#fff" stroke="#9c6b34" stroke-width=".5"/><circle cx="58" cy="46" r="1.05" fill="#e4e4e4"/></g><g class="pin" style="--dx:-16.8px;--dy:-19.3px;--r:-206deg;--d:0.1s"><circle cx="46" cy="41" r="2.4" fill="#fff" stroke="#9c6b34" stroke-width=".5"/><circle cx="46" cy="41" r="1.05" fill="#e4e4e4"/></g><g class="pin" style="--dx:-3.2px;--dy:-14.9px;--r:154deg;--d:0.1s"><circle cx="54" cy="41" r="2.4" fill="#fff" stroke="#9c6b34" stroke-width=".5"/><circle cx="54" cy="41" r="1.05" fill="#e4e4e4"/></g><g class="pin" style="--dx:15.8px;--dy:-20.0px;--r:147deg;--d:0.1s"><circle cx="62" cy="41" r="2.4" fill="#fff" stroke="#9c6b34" stroke-width=".5"/><circle cx="62" cy="41" r="1.05" fill="#e4e4e4"/></g><g class="pin" style="--dx:-11.4px;--dy:-17.4px;--r:-282deg;--d:0.15s"><circle cx="50" cy="36" r="2.4" fill="#fff" stroke="#9c6b34" stroke-width=".5"/><circle cx="50" cy="36" r="1.05" fill="#e4e4e4"/></g><g class="pin" style="--dx:11.0px;--dy:-22.3px;--r:-181deg;--d:0.15s"><circle cx="58" cy="36" r="2.4" fill="#fff" stroke="#9c6b34" stroke-width=".5"/><circle cx="58" cy="36" r="1.05" fill="#e4e4e4"/></g><g class="pin" style="--dx:4.6px;--dy:-22.2px;--r:-158deg;--d:0.2s"><circle cx="54" cy="31" r="2.4" fill="#fff" stroke="#9c6b34" stroke-width=".5"/><circle cx="54" cy="31" r="1.05" fill="#e4e4e4"/></g>
+    <circle id="ring" cx="54" cy="47" r="2" fill="none" stroke="#fff" stroke-width=".8"/>
+    <circle id="ball" cx="54" cy="150" r="5.2" fill="#1b2a4a"/>
+  </svg>
+  <div class="it"><b>ALLE NEUNE!</b><span>Taktik Zentrale</span></div>
+</div>
+<script>(function(){var i=document.getElementById("intro");function c(){if(!i)return;var e=i;i=null;e.classList.add("out");setTimeout(function(){e.remove();},450);}i.onclick=c;setTimeout(c,3500);if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)c();})();</script>
+<div id="gate" hidden>
+  <div class="bar"><div class="t"><h1>Taktik Zentrale</h1><small>Freischalten</small></div></div>
+  <div class="wrap">
+    <div class="card"><h2>Zugangscode</h2>
+      <input type="text" id="code" placeholder="z. B. KEG-AB12-CD34" autocapitalize="characters" autocomplete="off">
+      <div id="gateMsg" class="msg"></div>
+      <button id="gateGo" class="p">Freischalten</button></div>
+    <div class="card"><p class="mut" style="margin:0">Die App ist nur mit Zugangscode nutzbar. Den Code bekommst du von deinem Betreuer.</p>
+      <button id="demoGo" hidden></button></div>
+  </div>
+</div>
+
+<div id="setup" hidden>
+  <div class="bar"><div class="t"><h1>Einstellungen</h1><small>Einmalig einrichten, alles bleibt auf diesem Gerät</small></div></div>
+  <div class="wrap">
+    <div class="card" id="dataCard" hidden><h2>Daten</h2><div id="dataMsg" class="msg" style="margin:0 0 10px"></div><button id="dataRetry" class="s" style="width:100%">Daten neu laden</button></div>
+    <div class="card lnk"><h2>1 · Daten-Link</h2>
+      <input type="text" id="url" placeholder="https://docs.google.com/spreadsheets/d/e/…/pub?output=csv">
+      <input type="text" id="url2" placeholder="Optional: Link der veröffentlichten Tabelle (Blatt „Tabelle“)" style="margin-top:8px">
+      <input type="text" id="pdfUrl" placeholder="Liga-PDF für „Tabelle abrufen“" style="margin-top:8px">
+      <div class="row"><button id="ladeBtn" class="s">Daten laden</button></div>
+      <details><summary class="mut">Wo finde ich den Link?</summary>
+        <p class="mut">In Google Sheets: Datei → Teilen → Im Web veröffentlichen. Blatt „Liga_Datenbank“ und „Kommagetrennte Werte (.csv)“ wählen, auf Veröffentlichen klicken und den Link kopieren. Wer den Link kennt, kann die Daten lesen.</p></details></div>
+    <div class="card"><h2>Meine Mannschaft</h2><select id="teamSel"></select></div>
+    <div class="card"><h2>Verfügbare Spieler <span id="cntS"></span></h2><div id="kaderSetup" class="chips"></div>
+      <div class="row"><input type="text" id="neu" placeholder="Ergänzen: Nachname, Vorname"><button id="add" class="s">+</button></div></div>
+    <div class="card" id="lizCard" hidden><h2>Lizenz</h2><div id="lizInfo" class="mut"></div><div class="row"><button id="lizOut" class="s">Abmelden</button></div></div>
+    <div class="card" id="demoCard" hidden><h2>Demo-Modus</h2><p class="mut" style="margin:0 0 10px">Du nutzt Beispieldaten. Mit einem Code schaltest du deine echten Daten frei.</p><button id="toGate" class="s" style="width:100%">Code eingeben</button></div>
+    <div class="card" id="updCard"><h2>App-Update <span id="ver"></span></h2>
+      <div id="updInfo" class="mut" style="margin-bottom:8px"></div>
+      <input type="text" id="updUrl" class="lnk" placeholder="Drive-Ordner- oder Datei-Link zur APK">
+      <div class="row"><button id="updBtn" class="s">App aktualisieren</button></div>
+      <div id="updMsg" class="mut" style="margin-top:8px"></div></div>
+    <div class="card" id="admCard" hidden><h2>Betreuer</h2><p class="mut" style="margin:0 0 10px;font-size:.9rem">Liest die Ergebnisse aller bisherigen Spieltage aus den PDFs des Verbands und trägt neue Spiele in die Datenbank-Tabelle ein.</p><button id="ergBtn" class="p">Ergebnisse auslesen</button><div id="ergMsg" class="mut" style="margin-top:8px"></div>
+    <h2 style="margin:22px 0 10px">Verlegung eintragen</h2>
+    <select id="vlSpiel"></select>
+    <div class="row"><input type="date" id="vlDatum"><input type="time" id="vlZeit"></div>
+    <input type="text" id="vlHinweis" placeholder="Hinweis (optional)" style="margin-top:8px">
+    <div class="row"><button id="vlSave" class="s">Speichern</button><button id="vlDel" class="s">Verlegung löschen</button></div>
+    <div id="vlMsg" class="mut" style="margin-top:8px"></div></div>
+    <div class="card" id="calcCard"><h2>Berechnung anpassen</h2>
+      <details><summary><b>Werte der Berechnung ändern</b></summary>
+        <p class="mut" style="font-size:.88rem;margin:8px 0 0">Die Werte gelten nur auf diesem Gerät. Was jeder Wert bewirkt, steht unter „Anleitung“ → „So wird gerechnet“.</p>
+        <div id="optBox" class="opt"></div>
+        <button id="optReset" class="s" style="width:100%;margin-top:12px">Auf Standard zurücksetzen</button></details></div>
+    <div class="card" id="helpCard"><h2>Anleitung</h2>
+      <details><summary><b>So benutzt du die App</b></summary><div class="hp">
+        <ol>
+          <li><b>Einrichten:</b> Gib beim ersten Start deinen Code ein oder starte den Demo-Modus. In den Einstellungen wählst du deine Mannschaft und kreuzt die Spieler an, die dir grundsätzlich zur Verfügung stehen.</li>
+          <li><b>Reiter „Aufstellung“:</b> Die Taktik-Aufstellung gilt für Auswärtsspiele, bei denen du die Aufstellung des Heimteams kennst. Wähle den Gegner und danach für Position 1 bis 6 die Spieler des Gegners in dessen Reihenfolge. Offene Positionen sind erlaubt. Hake darunter an, wer heute dabei ist, und tippe auf „Aufstellung berechnen“.</li>
+          <li><b>Ergebnis:</b> Oben steht das erwartete Ergebnis. Darunter siehst du pro Position deinen Spieler und den Gegner mit Schnitt (Ø) und Form. Grün umrandet heißt, dein Spieler liegt vorn, rot heißt, der Gegner liegt vorn.</li>
+          <li><b>Verlegungen:</b> Wird ein Spiel verlegt, trägt der Betreuer es ein, in der App unter „Betreuer“ oder im Sheet. Die App zeigt dann den neuen Termin mit dem Hinweis „Verlegt“ und dem alten Termin darunter. Du siehst es nach dem Öffnen des Reiters oder nach ↻.</li>
+          <li><b>Reiter „Ansetzungen“:</b> Zeigt alle Spieltage mit Datum, Uhrzeit und Bahn. Oben steht dein nächstes Spiel mit einem Link zur Route. Tippst du auf dein nächstes oder ein kommendes Auswärtsspiel, springt die App zur Aufstellung und wählt den Gegner schon aus. „Ansetzungen abrufen“ holt den neuesten Stand von der Liga-Seite. Mit dem Schalter blendest du die Spiele anderer Teams aus. „Anderer Termin“ heißt, das Spiel liegt nicht am üblichen Datum des Spieltags.</li>
+          <li><b>Reiter „Tabelle“:</b> Zeigt die Liga-Tabelle. „Tabelle abrufen“ holt den neuesten Stand von der Liga-Seite. Mit dem Schalter wechselst du zwischen Gesamt, Auswärts und Heim.</li>
+          <li><b>Daten aktualisieren:</b> Mit ↻ oben lädst du neue Spielergebnisse aus der Datenquelle deines Vereins (Liga-Datenbank).</li>
+          <li><b>Updates:</b> Steht eine neue Version bereit, erscheint oben ein Hinweis. Mit „Jetzt aktualisieren“ lädst du sie herunter und bestätigst die Installation.</li>
+        </ol></div></details>
+      <details><summary><b>So wird gerechnet</b></summary><div class="hp">
+        <p><b>Datengrundlage:</b> Alle bisherigen Einzelergebnisse (Holz) aus der Liga-Datenbank. Namen werden unabhängig von der Reihenfolge „Nachname, Vorname“ erkannt.</p>
+        <p><b>1. Gegner (Ø und Form):</b> Für jeden Gegner-Spieler zählt der Schnitt seiner 3 besten Ergebnisse auf seiner Heimbahn, denn dort spielt ihr. Gibt es dort keine Ergebnisse, nimmt die App seine 3 besten Ergebnisse insgesamt. Ohne Daten rechnet sie mit 520, bei einer offenen Position mit 530. Die Form vergleicht den Schnitt seiner letzten 3 Spiele mit diesem Wert.</p>
+        <p><b>2. Eigene Spieler (Ø und Form):</b> Es zählt der Schnitt auf der Bahn des Gegners, sonst der Schnitt aller Auswärtsspiele, sonst aller Ergebnisse. Ohne Daten gilt 520. Die Form ist der Schnitt der letzten 2 Spiele. Für die Aufstellung zählen 90 % Basis und 10 % Form.</p>
+        <p><b>3. Auswahl und Reihenfolge:</b> Von allen angehakten Spielern nimmt die App die 6 mit dem höchsten Wert. Dann probiert sie alle 720 Reihenfolgen und wählt die mit den meisten gewonnenen Duellen. Der höhere Schnitt gewinnt, gleich zählt halb. Bei Gleichstand entscheidet das höhere Gesamtholz.</p>
+        <p><b>4. Erwartetes Ergebnis:</b> Jedes gewonnene Duell zählt 1 Punkt. Dazu kommen 2 Punkte, wenn die Summe der eigenen Schnitte höher ist als die der Gegner. So entsteht zum Beispiel „6 : 2“.</p>
+        <p><b>Form-Zeichen:</b> ▲ zuletzt mehr als 1 Holz über dem Schnitt, ▼ mehr als 1 Holz darunter, ● stabil.</p>
+        <p><b>Anpassen:</b> Alle genannten Zahlen sind Standardwerte. Unter „Berechnung anpassen“ kannst du sie ändern, zum Beispiel das Gewicht der Form, die Anzahl der Spiele für die Form, die Punkte oder ob alle Kombinationen geprüft werden.</p>
+        <p class="mut">Das ist eine Schätzung aus vergangenen Ergebnissen und keine Garantie.</p>
+      </div></details></div>
+    <div id="msgS" class="msg"></div>
+    <button id="saveS" class="p">Speichern</button>
+    <button id="cancelS" class="s" style="width:100%;margin-top:10px" hidden>Abbrechen</button>
+  </div>
+</div>
+
+<div id="plan" hidden>
+  <div class="bar"><div class="t"><h1 id="teamName"></h1><small id="stand"></small></div>
+    <button id="sync" class="ib" title="Daten aktualisieren">↻</button><button id="gear" class="ib" title="Einstellungen">⚙</button></div>
+  <div class="wrap" id="updBar" hidden style="padding-bottom:0"><div class="card" style="background:var(--chip);box-shadow:none"><span class="pill">Update</span> <b id="updTxt"></b><div class="row"><button id="updNow" class="s">Jetzt aktualisieren</button></div><div id="updBarMsg" class="mut" style="margin-top:6px"></div></div></div>
+  <div class="wrap" id="demoBar" hidden style="padding-bottom:0"><div class="card" style="background:var(--chip);box-shadow:none"><span class="pill">Demo</span> Beispieldaten. <b id="demoCode" style="color:var(--ac);cursor:pointer">Code eingeben</b></div></div>
+  <div class="wrap" id="vAuf">
+        <div class="card"><h2>Gegner</h2><select id="gegner"></select><div id="gk"></div></div>
+    <div class="card"><h2>Wer ist dabei? <span id="cnt"></span></h2><div id="kader" class="chips"></div></div>
+    <div id="msg" class="msg"></div><div id="res"></div>
+  </div>
+  <div class="wrap" id="vTab" hidden>
+    <div class="card"><button id="tabHol" class="p">Tabelle abrufen</button><div id="tabMsg" class="mut" style="margin-top:8px"></div></div>
+    <div class="card"><div class="seg"><label><input type="radio" name="ans" value="0" checked><span>Gesamt</span></label><label><input type="radio" name="ans" value="1"><span>Auswärts</span></label><label><input type="radio" name="ans" value="2"><span>Heim</span></label></div></div>
+    <div id="tabStand" class="mut" style="margin-top:12px"></div><div id="tabListe"></div>
+  </div>
+  <div class="wrap" id="vAns" hidden>
+    <div class="card"><button id="ansHol" class="p">Ansetzungen abrufen</button><div id="ansMsg" class="mut" style="margin-top:8px"></div></div>
+    <div class="card"><div class="seg"><label><input type="radio" name="ansf" value="1" checked><span>Mein Team</span></label><label><input type="radio" name="ansf" value="0"><span>Alle Spiele</span></label></div></div>
+    <div id="ansNext"></div><div id="ansStand" class="mut" style="margin-top:12px"></div><div id="verlStat" class="mut" style="font-size:.85rem;margin-top:2px"></div><div id="ansListe"></div>
+  </div>
+  <div class="dock" id="dock"><button id="calc" class="p">Aufstellung berechnen</button></div>
+  <div class="nav"><button id="nAuf" class="on"><b>🎳</b>Aufstellung</button><button id="nTab"><b>🏆</b>Tabelle</button><button id="nAns"><b>📅</b>Ansetzungen</button></div>
+</div>
+
+<script src="config.js"></script>
+<script src="web-bridge.js"></script>
+<script src="demo.js"></script>
+<script>
+//<LOGIC
+function parseCsv(t){
+  const rows=[];let r=[],f="",q=false;
+  for(let i=0;i<t.length;i++){
+    const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+    else if(c==='"')q=true;
+    else if(c===","){r.push(f);f="";}
+    else if(c==="\n"){r.push(f);rows.push(r);r=[];f="";}
+    else if(c!=="\r")f+=c;
+  }
+  if(f!==""||r.length){r.push(f);rows.push(r);}
+  return rows;
+}
+let DB=[];
+function norm_(s) { return (s == null ? "" : s).toString().toLowerCase().replace(/[^a-z0-9]/g, ""); }
+
+// Name als Schlüssel: egal ob "Caspar, Robin" oder "Robin, Caspar"
+function schluessel_(s) {
+  return (s == null ? "" : s).toString().toLowerCase().replace(/,/g, " ").split(/\s+/).filter(Boolean).sort().join(" ");
+}
+
+
+function teamListe_(ohneTeam) {
+  var d = DB;
+  if (d.length < 2) return [];
+  var ohne = norm_(ohneTeam), out = [];
+  for (var i = 1; i < d.length; i++) {
+    var t = d[i][0] ? d[i][0].toString().trim() : "";
+    var tl = t.toLowerCase();
+    if (t.length > 3 && t.indexOf(":") < 0 && t.indexOf(",") < 0 &&
+        tl.indexOf("gesamt") < 0 && tl.indexOf("unbekannt") < 0 && out.indexOf(t) < 0) {
+      var n = norm_(t);
+      if (ohne && (n.indexOf(ohne) >= 0 || ohne.indexOf(n) >= 0)) continue;
+      out.push(t);
+    }
+  }
+  return out.sort();
+}
+
+/** Alle Mannschaften der Datenbank (für die Einstellungen). */
+function holeTeamsFuerWeb() { return teamListe_(""); }
+
+/** Alle Gegner = alle Mannschaften außer der eigenen. */
+function holeGegnerFuerWeb(eigenesTeam) { return teamListe_(eigenesTeam); }
+
+/** Spieler einer Mannschaft (Spalte A = Mannschaft, Spalte C = Name). */
+function holeSpielerFuerTeam(teamName) {
+  var d = DB;
+  if (d.length < 2 || !teamName) return [];
+  var ziel = norm_(teamName.toString().split(",")[0]), out = [], keys = {};
+  for (var i = 1; i < d.length; i++) {
+    var t = norm_(d[i][0]);
+    var name = d[i][2] ? d[i][2].toString().trim() : "";
+    if (!t || !name) continue;
+    if (t.indexOf(ziel) >= 0 || ziel.indexOf(t) >= 0) {
+      var k = schluessel_(name);
+      if (!keys[k]) { keys[k] = 1; out.push(name); }
+    }
+  }
+  return out.sort();
+}
+
+function holeGegnerKaderFuerWeb(gegnerName) { return holeSpielerFuerTeam(gegnerName); }
+
+/**
+ * daten = { eigenesTeam, gegner, modus ("Heim"|"Auswärts"), kader:[...], gegnerKader:[6 Namen] }
+ */
+const OPT_STD={formGewicht:10,formEigen:2,letzteEigen:0,bahnEigen:true,stdEigen:520,
+  besteGegner:3,formGegner:3,bahnGegner:true,stdGegner:520,offenGegner:530,
+  ziel:"duelle",auswahl:"top6",punktDuell:1,bonus:2};
+
+/**
+ * daten = { eigenesTeam, gegner, modus ("Heim"|"Auswärts"), kader:[...], gegnerKader:[6 Namen], opt:{...} }
+ * opt überschreibt die Standardwerte aus OPT_STD.
+ */
+function berechnenWebTaktik(daten) {
+  var d = DB;
+  if (d.length < 2) return { error: "Datenbank fehlt" };
+  var o = Object.assign({}, OPT_STD, daten.opt || {});
+  var zahl = function (v, min, max, std) { v = Number(v); return isNaN(v) ? std : Math.min(max, Math.max(min, v)); };
+  o.formGewicht = zahl(o.formGewicht, 0, 100, 10); o.formEigen = zahl(o.formEigen, 1, 10, 2); o.letzteEigen = zahl(o.letzteEigen, 0, 50, 0);
+  o.besteGegner = zahl(o.besteGegner, 1, 20, 3); o.formGegner = zahl(o.formGegner, 1, 10, 3);
+  o.stdEigen = zahl(o.stdEigen, 100, 900, 520); o.stdGegner = zahl(o.stdGegner, 100, 900, 520); o.offenGegner = zahl(o.offenGegner, 100, 900, 530);
+  o.punktDuell = zahl(o.punktDuell, 0, 20, 1); o.bonus = zahl(o.bonus, 0, 20, 2);
+
+  var eigen = norm_(daten.eigenesTeam);
+  var gegnerN = norm_(daten.gegner.toString().split(",")[0]);
+  var modus = daten.modus;
+  var werIstDa = daten.kader || [];
+  var gesetzt = daten.gegnerKader || [];
+  var istEigen = function (n) { return !!eigen && !!n && (n.indexOf(eigen) >= 0 || eigen.indexOf(n) >= 0); };
+  var avg = function (a) { var s = 0; for (var q = 0; q < a.length; q++) s += a[q]; return s / a.length; };
+
+  // Gegner: Schnitt der besten Ergebnisse (auf der passenden Bahn), Form = letzte Spiele
+  var gegnerSchnitte = [], gegnerTrends = [];
+  for (var g = 0; g < 6; g++) {
+    var gName = gesetzt[g];
+    if (!gName) { gegnerSchnitte.push(o.offenGegner); gegnerTrends.push(0); continue; }
+    var gKey = schluessel_(gName), alleG = [], bahnG = [];
+    for (var i = d.length - 1; i >= 1; i--) {          // neueste zuerst
+      var z = d[i];
+      if (!z || z.length < 4 || schluessel_(z[2]) !== gKey) continue;
+      var t = norm_(z[0]), b = norm_(z[1]), k = parseFloat(z[3]) || 0;
+      alleG.push(k);
+      if (modus === "Auswärts" && t === gegnerN && b === gegnerN) bahnG.push(k);
+      if (modus === "Heim" && t === gegnerN && istEigen(b)) bahnG.push(k);
+    }
+    var gBasis = o.stdGegner, ziel = (o.bahnGegner && bahnG.length) ? bahnG : alleG;
+    if (ziel.length) gBasis = avg(ziel.slice().sort(function (a, b2) { return b2 - a; }).slice(0, o.besteGegner));
+    var gForm = alleG.length ? avg(alleG.slice(0, o.formGegner)) : gBasis;
+    gegnerSchnitte.push(gBasis);
+    gegnerTrends.push(gForm - gBasis);
+  }
+
+  // Eigene Spieler
+  var cut = function (a) { return o.letzteEigen > 0 ? a.slice(0, o.letzteEigen) : a; };
+  var w = o.formGewicht / 100;
+  var pool = [];
+  for (var s = 0; s < werIstDa.length; s++) {
+    var key = schluessel_(werIstDa[s]), alle = [], spez = [], ausw = [];
+    for (var j = d.length - 1; j >= 1; j--) {
+      var zz = d[j];
+      if (!zz || zz.length < 4 || schluessel_(zz[2]) !== key || !istEigen(norm_(zz[0]))) continue;
+      var bb = norm_(zz[1]), kk = parseFloat(zz[3]) || 0;
+      alle.push(kk);
+      if (bb && gegnerN && (bb === gegnerN || bb.indexOf(gegnerN) >= 0)) spez.push(kk);
+      if (!istEigen(bb) && bb !== "heim") ausw.push(kk);
+    }
+    var basis = o.stdEigen;
+    if (modus === "Heim") { if (alle.length) basis = avg(cut(alle)); }
+    else if (o.bahnEigen && spez.length) basis = avg(cut(spez));
+    else if (ausw.length) basis = avg(cut(ausw));
+    else if (alle.length) basis = avg(cut(alle));
+    var form = alle.length ? avg(alle.slice(0, o.formEigen)) : basis;
+    pool.push({ name: werIstDa[s], schnitt: basis * (1 - w) + form * w, trend: form - basis });
+  }
+
+  if (pool.length < 6) return { error: "Mindestens 6 Spieler auswählen." };
+  pool.sort(function (a, b3) { return b3.schnitt - a.schnitt; });
+
+  // Gruppen von 6 Spielern, die geprüft werden
+  var gruppen = [];
+  if (o.auswahl === "alle" && pool.length <= 12) {
+    var wahl = function (start, akt) {
+      if (akt.length === 6) { gruppen.push(akt.slice()); return; }
+      for (var x = start; x < pool.length; x++) { akt.push(pool[x]); wahl(x + 1, akt); akt.pop(); }
+    };
+    wahl(0, []);
+  } else {
+    gruppen.push(pool.slice(0, 6));
+  }
+
+  var beste = [], maxSiege = -1, maxHolz = -1;
+  var pruefe = function (m) {
+    var siege = 0, holz = 0;
+    for (var p = 0; p < 6; p++) {
+      holz += m[p].schnitt;
+      if (m[p].schnitt > gegnerSchnitte[p]) siege++;
+      else if (m[p].schnitt === gegnerSchnitte[p]) siege += 0.5;
+    }
+    var besser = o.ziel === "holz" ? (holz > maxHolz || (holz === maxHolz && siege > maxSiege))
+                                   : (siege > maxSiege || (siege === maxSiege && holz > maxHolz));
+    if (besser) { maxSiege = siege; maxHolz = holz; beste = m.slice(); }
+  };
+  var permutiere = function (a, k) {
+    if (k === a.length) { pruefe(a); return; }
+    for (var x = k; x < a.length; x++) {
+      var tmp = a[k]; a[k] = a[x]; a[x] = tmp;
+      permutiere(a, k + 1);
+      tmp = a[k]; a[k] = a[x]; a[x] = tmp;
+    }
+  };
+  gruppen.forEach(function (gr) { permutiere(gr, 0); });
+
+  var gg = 0; gegnerSchnitte.forEach(function (v) { gg += v; });
+  var bonusWir = maxHolz > gg;
+  var ergebnis = [maxSiege * o.punktDuell + (bonusWir ? o.bonus : 0), (6 - maxSiege) * o.punktDuell + (bonusWir ? 0 : o.bonus)];
+  return { aufstellung: beste, siege: maxSiege, gesamtHolz: maxHolz, gegnerSchnitte: gegnerSchnitte, gegnerTrends: gegnerTrends, ergebnis: ergebnis };
+}
+const API={holeTeamsFuerWeb,holeGegnerFuerWeb,holeSpielerFuerTeam,berechnenWebTaktik};
+//LOGIC>
+
+const A=window.Android;
+const kv={
+  get:k=>{try{return A?A.get(k):(localStorage.getItem(k)||"");}catch(e){return "";}},
+  set:(k,v)=>{try{if(A)A.set(k,v);else localStorage.setItem(k,v);}catch(e){}}
+};
+const $=id=>document.getElementById(id);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e;};
+const run=(fn,...a)=>Promise.resolve().then(()=>API[fn](...a));
+let DEMO=false,L=null,S=null;try{S=JSON.parse(kv.get("settings")||"null");}catch(e){}
+const save=()=>{if(!DEMO)kv.set("settings",JSON.stringify(S));};
+
+function lies(name){if(DEMO)return name==="db"?DEMO_DB:name==="tabelle"?DEMO_TAB:"";try{return A?A.csv(name):(localStorage.getItem(name)||"");}catch(e){return "";}}
+function ladeCache(){
+  try{const t=lies("db");DB=t?parseCsv(t).filter(r=>r.some(x=>x!=="")):[];}catch(e){DB=[];}
+  return DB.length>1;
+}
+let TAB=[],TABT=0;
+function ladeTabelle(){
+  if(!DEMO)try{const l=JSON.parse(kv.get("tabLive")||"null");if(l&&l.rows&&l.rows.length){TAB=l.rows;TABT=l.t||0;return;}}catch(e){}
+  TABT=0;
+  try{const t=lies("tabelle");TAB=t?parseCsv(t).filter(r=>r.length>=12&&/^\d+$/.test(r[0].trim())):[];}catch(e){TAB=[];}
+}
+const wait={};
+window.onDaten=(name,ok)=>{const f=wait[name];if(f){delete wait[name];f(!!ok);}};
+function hole(url,name){
+  return new Promise(ok=>{
+    wait[name]=ok;
+    if(A)A.laden(url,name);
+    else fetch(url).then(r=>r.text()).then(t=>{localStorage.setItem(name,t);window.onDaten(name,true);}).catch(()=>window.onDaten(name,false));
+  });
+}
+async function aktualisiere(url){const ok=await hole(url,"db");if(ok)ladeCache();return ok&&DB.length>1;}
+async function aktualisiereTab(url){const ok=await hole(url,"tabelle");if(ok)ladeTabelle();return ok;}
+const normT=s=>(s||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+function renderTab(){
+  const box=$("tabListe");box.textContent="";
+  if(!TAB.length){$("tabStand").textContent=S&&S.url2?"Noch keine Tabelle geladen. Tippe oben auf ↻.":"Kein Tabellen-Link eingetragen. Du kannst ihn in den Einstellungen (⚙) ergänzen.";return;}
+  $("tabStand").textContent="Stand: "+(TAB[0][12]||"unbekannt")+(TABT?" · abgerufen "+new Date(TABT).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"");
+  const k=+document.querySelector("input[name=ans]:checked").value,i=3+3*k,eig=normT(S&&S.team);
+  TAB.forEach(r=>{
+    const n=normT(r[1]),c=el("div","trow"+(eig&&(n.includes(eig)||eig.includes(n))?" me":""));
+    const mid=el("div"),re=el("div","r");
+    mid.append(el("b","",r[1]),el("small","",r[2]+" Spiele · Punkte "+r[i]+" · MP "+r[i+1]));
+    re.append(el("b","",r[i+2]?"Ø "+r[i+2]:""));
+    c.append(el("div","pl",r[0]),mid,re);box.append(c);
+  });
+}
+function zeigeTab(i){
+  $("vAuf").hidden=i!==0;$("vTab").hidden=i!==1;$("vAns").hidden=i!==2;$("dock").hidden=i!==0;
+  $("nAuf").className=i===0?"on":"";$("nTab").className=i===1?"on":"";$("nAns").className=i===2?"on":"";
+  if(i===1)renderTab();if(i===2){renderAns();holeVerl();}window.scrollTo(0,0);
+}
+$("nAuf").onclick=()=>zeigeTab(0);$("nTab").onclick=()=>zeigeTab(1);$("nAns").onclick=()=>zeigeTab(2);
+document.querySelectorAll("input[name=ans]").forEach(r=>r.onchange=renderTab);
+function fill(sel,items,val,leer){
+  sel.textContent="";
+  if(leer!==undefined){const o=el("option","",leer);o.value="";sel.append(o);}
+  items.forEach(t=>{const o=el("option","",t);o.value=t;sel.append(o);});
+  if(val)sel.value=val;
+}
+const picked=box=>[...box.querySelectorAll("input:checked")].map(i=>i.value);
+function chips(box,names,checked,out){
+  box.textContent="";
+  const upd=()=>{out.textContent=picked(box).length+" ausgewählt";};
+  names.forEach(n=>{const l=el("label","chip"),c=el("input");c.type="checkbox";c.value=n;c.checked=checked.has(n);c.onchange=upd;l.append(c,el("span","",n));box.append(l);});
+  upd();
+}
+
+async function fuelleTeams(){fill($("teamSel"),await run("holeTeamsFuerWeb"),S&&S.team);await ladeKader();}
+async function zeigeSetup(){
+  $("plan").hidden=true;$("gate").hidden=true;$("setup").hidden=false;$("cancelS").hidden=!(S&&S.team);
+  $("url").value=(S&&S.url)||"";$("url2").value=(S&&S.url2)||"";$("updUrl").value=kv.get("updUrl")||UPD_DEFAULT;$("pdfUrl").value=kv.get("pdfUrl")||PDF_DEFAULT;
+  document.body.className=DEMO?"mode-demo":L?"mode-lic":"";
+  baueOpt();$("admCard").hidden=!(L&&kv.get("admin")==="1"&&!DEMO);if(!$("admCard").hidden)fuelleVl();$("lizCard").hidden=!L;$("demoCard").hidden=!DEMO;$("updCard").hidden=DEMO;
+  $("lizInfo").textContent=L?((L.name||"Lizenz")+" · Code …"+L.code.slice(-4)):"";
+  const keine=!DEMO&&DB.length<2;$("dataCard").hidden=!keine;
+  if(keine)$("dataMsg").textContent=(!S||!S.url)?(L?"Für diesen Code ist kein Daten-Link hinterlegt. Bitte beim Anbieter melden.":"Noch keine Daten geladen. Trage oben den Daten-Link ein."):"Die Daten konnten nicht geladen werden. Der Link muss auf die veröffentlichte CSV-Datei zeigen (endet auf output=csv). Er beginnt mit: "+S.url.slice(0,70)+"…";$("ver").textContent=(A&&A.version)?"v"+A.version():"";window.scrollTo(0,0);
+  if(DB.length>1)await fuelleTeams();
+}
+async function ladeKader(){
+  const t=$("teamSel").value;if(!t)return;
+  const sp=await run("holeSpielerFuerTeam",t);
+  const alt=S&&S.team===t?S.kader:sp;
+  chips($("kaderSetup"),sp.concat(alt.filter(n=>!sp.includes(n))),new Set(alt),$("cntS"));
+}
+$("teamSel").onchange=()=>ladeKader();
+$("ladeBtn").onclick=async()=>{
+  const u=$("url").value.trim(),u2=$("url2").value.trim();
+  if(!/^https:\/\//.test(u)){$("msgS").textContent="Bitte den kompletten Link mit https:// einfügen.";return;}
+  $("msgS").textContent="Lade …";
+  if(!await aktualisiere(u)){$("msgS").textContent="Daten konnten nicht geladen werden. Link prüfen und Internet einschalten.";return;}
+  let m=(DB.length-1)+" Datenzeilen geladen.";
+  if(u2){m+=await aktualisiereTab(u2)?" Tabelle geladen.":" Tabelle konnte nicht geladen werden.";}
+  $("msgS").textContent=m;
+  await fuelleTeams();
+};
+$("add").onclick=()=>{
+  const n=$("neu").value.trim();if(!n)return;
+  const c=picked($("kaderSetup")),all=[...$("kaderSetup").querySelectorAll("input")].map(i=>i.value);
+  if(!all.includes(n))all.push(n);c.push(n);chips($("kaderSetup"),all,new Set(c),$("cntS"));$("neu").value="";
+};
+$("saveS").onclick=()=>{
+  const kader=picked($("kaderSetup")),url=$("url").value.trim();
+  if(DB.length<2||(!url&&!DEMO&&!L)){$("msgS").textContent="Bitte zuerst die Daten laden.";return;}
+  if(!$("teamSel").value){$("msgS").textContent="Bitte Mannschaft wählen.";return;}
+  if(kader.length<6){$("msgS").textContent="Bitte mindestens 6 Spieler auswählen.";return;}
+  S=DEMO?{demo:true,team:$("teamSel").value,kader}:{url,url2:$("url2").value.trim(),team:$("teamSel").value,kader};save();if(!DEMO&&!L)kv.set("pdfUrl",$("pdfUrl").value.trim()||PDF_DEFAULT);$("msgS").textContent="";zeigePlan();
+};
+$("cancelS").onclick=zeigePlan;
+$("gear").onclick=zeigeSetup;
+
+async function fuelleGegner(){fill($("gegner"),await run("holeGegnerFuerWeb",S.team),$("gegner").value,"Gegner wählen …");}
+async function zeigePlan(){
+  $("setup").hidden=true;$("gate").hidden=true;$("plan").hidden=false;$("demoBar").hidden=!DEMO;zeigeTab(0);$("res").textContent="";$("msg").textContent="";window.scrollTo(0,0);
+  $("teamName").textContent=S.team;
+  chips($("kader"),S.kader,new Set(S.kader),$("cnt"));
+  $("gk").textContent="";
+  await fuelleGegner();
+  $("stand").textContent=DEMO?"Demo-Daten":(DB.length-1)+" Datenzeilen (gespeicherter Stand)";
+  $("sync").click();
+}
+$("sync").onclick=async()=>{
+  if(!S||!S.url)return;
+  $("stand").textContent="Aktualisiere …";
+  const ok=await aktualisiere(S.url);
+  if(S.url2)await aktualisiereTab(S.url2);
+  await fuelleGegner();renderTab();
+  $("stand").textContent=ok?(DB.length-1)+" Datenzeilen, aktuell":"Offline · letzter Stand ("+(DB.length-1)+" Zeilen)";
+  holeVerl();
+  if(L)revalidiere();
+};
+$("gegner").onchange=async()=>{
+  $("gk").textContent="";const g=$("gegner").value;if(!g)return;
+  const sp=await run("holeSpielerFuerTeam",g);
+  for(let i=1;i<=6;i++){const s=el("select","gk");fill(s,sp,"","Position "+i+" – offen");$("gk").append(s);}
+};
+const tr=v=>v>1?"▲ +"+Math.round(v):v<-1?"▼ "+Math.round(v):"● stabil";
+$("calc").onclick=async()=>{
+  $("msg").textContent="";$("res").textContent="";
+  const kader=picked($("kader"));
+  if(!$("gegner").value){$("msg").textContent="Bitte Gegner wählen.";return;}
+  if(kader.length<6){$("msg").textContent="Bitte mindestens 6 anwesende Spieler wählen.";return;}
+  const gk=[...document.querySelectorAll(".gk")].map(s=>s.value);
+  try{
+    const r=await run("berechnenWebTaktik",{eigenesTeam:S.team,gegner:$("gegner").value,
+      modus:"Auswärts",kader,gegnerKader:gk,opt:holeOpt()});
+    if(r.error){$("msg").textContent=r.error;return;}
+    const gg=r.gegnerSchnitte.reduce((a,b)=>a+b,0),wp=r.gesamtHolz>gg?2:0,res=$("res");
+    const sum=el("div","sum");
+    sum.append(el("small","","Erwartetes Ergebnis"),el("div","score",r.ergebnis[0]+" : "+r.ergebnis[1]),el("small","","Holz "+Math.round(r.gesamtHolz)+" gegen "+Math.round(gg)));
+    res.append(sum);
+    r.aufstellung.forEach((p,i)=>{
+      const gs=r.gegnerSchnitte[i],c=el("div","pos "+(p.schnitt>gs?"win":"lose")),who=el("div","who"),vs=el("div","vs");
+      who.append(el("b","",p.name),el("small","","Ø "+Math.round(p.schnitt)+" · "+tr(p.trend)));
+      vs.append(el("small","","gegen"),el("b","",gk[i]||"offen"),el("small","","Ø "+Math.round(gs)+" · "+tr(r.gegnerTrends[i])));
+      c.append(el("div","n",i+1),who,vs);res.append(c);
+    });
+    sum.scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(e){$("msg").textContent="Fehler: "+e.message;}
+};
+const PDF_DEFAULT="http://www.kegeln-okv.de/SML2.pdf";
+const UPD_DEFAULT="https://drive.google.com/drive/folders/1pz5g6gyhAZ5oLBCn7XQu_8A46ZPsqaZ2?usp=drive_link";
+function ladePdfJs(){
+  return new Promise((ok,err)=>{
+    if(window.pdfjsLib)return ok();
+    const s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+    s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";ok();};
+    s.onerror=()=>err(new Error("pdf.js konnte nicht geladen werden (Internet prüfen)."));
+    document.head.appendChild(s);
+  });
+}
+async function seiten(data){   // liefert die Textzeilen je Seite
+  const pdf=await pdfjsLib.getDocument({data}).promise,out=[];
+  for(let p=1;p<=pdf.numPages;p++){
+    const tc=await (await pdf.getPage(p)).getTextContent();
+    const its=tc.items.filter(i=>i.str.trim()).map(i=>({s:i.str.trim(),x:i.transform[4],y:i.transform[5]}));
+    its.sort((a,b)=>b.y-a.y||a.x-b.x);let cur=null;const ls=[];
+    for(const it of its){if(cur&&Math.abs(cur.y-it.y)<3)cur.it.push(it);else{cur={y:it.y,it:[it]};ls.push(cur);}}
+    out.push(ls.map(l=>l.it.sort((a,b)=>a.x-b.x)));
+  }
+  return out;
+}
+//<TAB
+const TKOPF=["Pl","Verein","Sp","Punkte","MP","Schnitt","Ausw. Punkte","Ausw. MP","Ausw. Schnitt","Heim Punkte","Heim MP","Heim Schnitt","Stand"];
+function parseTabelle(ls){
+  let sp="",sa="",da="";const out=[];
+  const P="(\\d+\\s*:\\s*\\d+)",N="(\\d+,\\d)";
+  const re=new RegExp("^(\\d+)\\.\\s+(.+?)\\s+(\\d+)\\s+"+[P,P,N,P,P,N,P,P,N].join("\\s+"));
+  const c=x=>x.replace(/\s*:\s*/,":");
+  for(const l of ls){
+    const t=l.map(i=>i.s).join(" ").replace(/\s+/g," ").trim();
+    let m=t.match(/(\d+)\.\s*Spieltag\s+Saison\s+(\S+)/);
+    if(m){sp=m[1];sa=m[2];}
+    m=t.match(/\b(\d{2}\.\d{2}\.\d{4})\b/);
+    if(m&&!da)da=m[1];
+    m=t.match(re);
+    if(m)out.push([m[1],m[2].trim(),m[3],c(m[4]),c(m[5]),m[6],c(m[7]),c(m[8]),m[9],c(m[10]),c(m[11]),m[12]]);
+  }
+  const stand=(sp?sp+". Spieltag":"")+(da?", "+da:"")+(sa?" (Saison "+sa+")":"");
+  return out.map(r=>r.concat(stand));
+}
+
+$("tabHol").onclick=async()=>{
+  $("tabHol").disabled=true;$("tabMsg").textContent="Rufe Tabelle ab …";
+  try{
+    if(DEMO)throw new Error("Im Demo-Modus nicht verfügbar.");
+    if(!A||!A.holePdf)throw new Error("Das geht nur in der installierten App.");
+    let tb;
+    if(kv.get("pdfUrl")==="-"&&kv.get("ergUrl")){tb=await tabelleSachsen();}
+    else{
+      await new Promise((ok,err)=>{window.onPdf=r=>r?ok():err(new Error("PDF konnte nicht geladen werden (Internet, Link?)."));A.holePdf(fixHttp(quelle("pdfUrl",PDF_DEFAULT)));});
+      await ladePdfJs();
+      const bin=atob(A.pdfBase64()),u8=new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+      const pg=await seiten(u8);tb=pg.length?parseTabelle(pg[0]):[];
+    }
+    if(!tb.length)throw new Error("Auf Seite 1 wurde keine Tabelle gefunden.");
+    kv.set("tabLive",JSON.stringify({t:Date.now(),rows:tb}));ladeTabelle();renderTab();
+    $("tabMsg").textContent="Aktualisiert: "+tb[0][12];
+  }catch(e){$("tabMsg").textContent="Fehler: "+e.message;}
+  finally{$("tabHol").disabled=false;}
+};
+$("updBtn").onclick=()=>{
+  const u=$("updUrl").value.trim()||UPD_DEFAULT;
+  if(!A||!A.appUpdate){$("updMsg").textContent="Das Update funktioniert nur in der installierten App.";return;}
+  if(!/^https:\/\//.test(u)){$("updMsg").textContent="Bitte den Drive-Link zur APK einfügen.";return;}
+  kv.set("updUrl",u);$("updMsg").textContent="Starte …";A.appUpdate(u);
+};
+window.onUpdate=(s,m)=>{
+  const t={erlaubnis:"Bitte erlaube dieser App einmalig „Apps installieren“ (die Einstellung wurde geöffnet) und tippe danach noch einmal auf Update.",
+    laedt:"Lade Update …",aktuell:"Keine neuere Version im Link gefunden. Installiert: "+m+".",fertig:"Update bereit. Bestätige jetzt die Installation.",fehler:"Fehler: "+m};
+  $("updMsg").textContent=t[s]||m;$("updBarMsg").textContent=t[s]||m;
+};
+// ---------- Berechnung anpassen ----------
+const OPT_DEF=[
+ ["h","Eigene Spieler"],
+ ["formGewicht","Gewicht der aktuellen Form (%)","n",0,100],
+ ["formEigen","Form aus den letzten … Spielen","n",1,10],
+ ["letzteEigen","Schnitt nur aus den letzten … Spielen (0 = alle)","n",0,50],
+ ["bahnEigen","Ergebnisse auf der Bahn des Gegners bevorzugen","b"],
+ ["stdEigen","Wert, wenn keine Daten vorhanden sind","n",100,900],
+ ["h","Gegner"],
+ ["besteGegner","Schnitt aus den … besten Ergebnissen","n",1,20],
+ ["formGegner","Form aus den letzten … Spielen","n",1,10],
+ ["bahnGegner","Heimbahn des Gegners berücksichtigen","b"],
+ ["stdGegner","Wert, wenn keine Daten vorhanden sind","n",100,900],
+ ["offenGegner","Wert für eine offene Position","n",100,900],
+ ["h","Aufstellung und Punkte"],
+ ["ziel","Ziel der Aufstellung","s",[["duelle","Meiste Duelle, dann Holz"],["holz","Höchstes Gesamtholz"]]],
+ ["auswahl","Spielerauswahl","s",[["top6","Die 6 mit dem besten Schnitt"],["alle","Alle Kombinationen (bis 12)"]]],
+ ["punktDuell","Punkte pro gewonnenem Duell","n",0,20],
+ ["bonus","Punkte für das höhere Gesamtholz","n",0,20],
+];
+function holeOpt(){let o={};try{o=JSON.parse(kv.get("calc")||"{}")||{};}catch(e){}return Object.assign({},OPT_STD,o);}
+function baueOpt(){
+  const box=$("optBox");if(box.childElementCount)return;
+  const o=holeOpt();
+  const speichern=()=>{const n={};OPT_DEF.forEach(d=>{if(d[0]==="h")return;const e=$("opt_"+d[0]);n[d[0]]=d[2]==="b"?e.checked:d[2]==="n"?(e.value===""?OPT_STD[d[0]]:Math.min(d[4],Math.max(d[3],+e.value))):e.value;});kv.set("calc",JSON.stringify(n));};
+  OPT_DEF.forEach(d=>{
+    if(d[0]==="h"){box.append(el("h3","",d[1]));return;}
+    const wrap=el("div");wrap.style.margin="10px 0";
+    let e;
+    if(d[2]==="b"){const l=el("label","cb");e=el("input");e.type="checkbox";e.checked=!!o[d[0]];l.append(e,el("span","",d[1]));wrap.append(l);}
+    else{
+      wrap.append(el("label","t",d[1]));
+      if(d[2]==="n"){e=el("input");e.type="number";e.inputMode="numeric";e.min=d[3];e.max=d[4];e.value=o[d[0]];}
+      else{e=el("select");d[3].forEach(x=>{const op=el("option","",x[1]);op.value=x[0];e.append(op);});e.value=o[d[0]];}
+      wrap.append(e);
+    }
+    e.id="opt_"+d[0];e.onchange=speichern;box.append(wrap);
+  });
+  $("optReset").onclick=()=>{kv.set("calc","");box.textContent="";baueOpt();};
+}
+// ---------- Ansetzungen ----------
+const ANS_DEFAULT="http://www.kegeln-okv.de/ML2.pdf";
+const quelle=(k,d)=>{const v=kv.get(k);if(v==="-")throw new Error("Für diese Liga ist das noch nicht eingerichtet.");return v||d;};
+const fixHttp=u=>u.trim().replace(/^https:\/\/(www\.kegeln-okv\.de)/,"http://$1");
+//<ANS
+function parseAns(p1,p2){
+  const txt=l=>l.map(i=>i.s).join(" ").replace(/\s+/g," ").trim();
+  const re=/^(\d{3})\s+(\d{2}\.\d{2}\.\d{4})\s+(\d{1,2}:\d{2})\s*Uhr\s+(.+?)\s+:\s+(.+?)\s+(\d{1,2}:\d{2})\s*Uhr\s+(\d{2}\.\d{2}\.\d{4})\s+(\d{3})/;
+  const games=[];let sh=0,sr=0;
+  for(const l of p2){
+    const t=txt(l);let m=t.match(/^(\d+)\.\s*Spieltag\s+(\d+)\.\s*Spieltag/);
+    if(m){sh=+m[1];sr=+m[2];continue;}
+    m=t.match(re);if(!m)continue;
+    games.push({nr:m[1],st:sh,d:m[2],z:m[3],h:m[4],g:m[5]});
+    games.push({nr:m[8],st:sr,d:m[7],z:m[6],h:m[5],g:m[4]});
+  }
+  const teams=[...new Set(games.flatMap(g=>[g.h,g.g]))],addr={};let cur=null;
+  for(const l of p1||[]){
+    const t=txt(l);
+    const T=teams.find(x=>t===x||t.startsWith(x+" ")||(/^\d+\./.test(t)&&t.indexOf(x)>=0));
+    if(T){cur=T;continue;}
+    const m=t.match(/^Bahnanschrift:\s*[\d-]+\s+(.+)$/);
+    if(m&&cur)addr[cur]=m[1].trim();
+  }
+  return {games,addr};
+}
+//ANS>
+let ANS={games:[],addr:{}},ANST=0;
+function ladeAns(){
+  ladeVerl();
+  if(DEMO){ANS=demoAns();ANST=0;return;}
+  try{const l=JSON.parse(kv.get("ansLive")||"null");if(l&&l.games&&l.games.length){ANS={games:l.games,addr:l.addr||{}};ANST=l.t||0;return;}}catch(e){}
+  ANS={games:[],addr:{}};ANST=0;
+}
+const isoD=d=>d.split(".").reverse().join("-");
+function renderAns(){
+  const box=$("ansListe"),nx=$("ansNext");box.textContent="";nx.textContent="";
+  $("ansHol").disabled=false;
+  if(!ANS.games.length){$("ansStand").textContent=DEMO?"":"Noch keine Ansetzungen geladen. Tippe oben auf „Ansetzungen abrufen“.";return;}
+  const eig=normT(S&&S.team),mine=document.querySelector("input[name=ansf]:checked").value==="1";
+  const istMein=n=>!!eig&&(normT(n).includes(eig)||eig.includes(normT(n)));
+  const heute=new Date().toISOString().slice(0,10);
+  const wt=d=>new Date(isoD(d)+"T12:00:00").toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"});
+  // üblicher Termin je Spieltag (häufigstes Datum, nur bei klarer Mehrheit)
+  const usual={};
+  ANS.games.forEach(g=>{(usual[g.st]=usual[g.st]||{})[g.d]=(usual[g.st][g.d]||0)+1;});
+  Object.keys(usual).forEach(st=>{const e=Object.entries(usual[st]).sort((a,b)=>b[1]-a[1]),tot=e.reduce((s,x)=>s+x[1],0);usual[st]=e[0][1]*2>tot?e[0][0]:null;});
+  const vm={};VERL.forEach(v=>{vm[String(+v.nr)]=v;});
+  const verlegt=g=>{const v=vm[String(+g.nr)];if(!v)return g;const d=v.d||g.d,z=v.z||g.z;if(d===g.d&&z===g.z)return g;return Object.assign({},g,{d,z,verl:{d:g.d,z:g.z,h:v.h}});};
+  const alle=ANS.games.map(verlegt).sort((a,b)=>isoD(a.d).localeCompare(isoD(b.d))||(+a.nr)-(+b.nr));
+  // nächstes Spiel des eigenen Teams
+  const next=alle.find(g=>(istMein(g.h)||istMein(g.g))&&isoD(g.d)>=heute);
+  if(next&&eig){
+    const heim=istMein(next.h),gegner=heim?next.g:next.h,ort=ANS.addr[next.h];
+    const c=el("div","nxt");
+    c.append(el("small","","Nächstes Spiel"),el("b","",wt(next.d)+" · "+next.z+" Uhr"),el("div","",(heim?"Heim gegen ":"Auswärts bei ")+gegner));
+    if(next.verl)c.append(el("small","","Verlegt"+(next.verl.h?": "+next.verl.h:"")+" · statt "+wt(next.verl.d)+" · "+next.verl.z+" Uhr"));
+    if(ort){const a=el("a","","Bahn: "+ort+" · Route");a.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(ort);a.onclick=e=>e.stopPropagation();c.append(a);}
+    if(heim)c.append(el("small","","Heimspiel: die Taktik-Aufstellung gilt nur für Auswärtsspiele"));else{c.append(el("small","","Tippen, um die Aufstellung zu planen"));c.style.cursor="pointer";c.onclick=()=>zumSpiel(next);}
+    nx.append(c);
+  }
+  verlStatus(alle);
+  $("ansStand").textContent="Stand: "+(ANST?"abgerufen "+new Date(ANST).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"Demo-Daten");
+  const gruppen={};
+  alle.forEach(g=>{if(mine&&!(istMein(g.h)||istMein(g.g)))return;(gruppen[g.st]=gruppen[g.st]||[]).push(g);});
+  if(mine&&!Object.keys(gruppen).length){
+    const namen=[...new Set(ANS.games.flatMap(g=>[g.h,g.g]))].slice(0,4).join(", ");
+    const m=el("div","mut","Kein Spiel für „"+((S&&S.team)||"(leer)")+"“ gefunden. In den Ansetzungen stehen zum Beispiel: "+namen+". Öffne die Einstellungen, wähle unter „Meine Mannschaft“ deine Mannschaft und tippe auf „Speichern“.");
+    m.style.cssText="margin:16px 4px";box.append(m);
+  }
+  Object.keys(gruppen).map(Number).sort((a,b)=>a-b).forEach(st=>{
+    const kopf=el("div","mut",st+". Spieltag");kopf.style.cssText="margin:16px 4px 0;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em";box.append(kopf);
+    gruppen[st].forEach(g=>{
+      const me=istMein(g.h)||istMein(g.g),c=el("div","trow ansr"+(me&&eig?" me":"")+(isoD(g.d)<heute?" alt":""));
+      const top=el("div","dt");top.append(el("b","",wt(g.d)+" · "+g.z+" Uhr"));
+      if(me&&eig)top.append(el("span","chip2",istMein(g.h)?"Heim":"Auswärts"));
+      if(g.verl)top.append(el("span","chip2 w","Verlegt"));else if(usual[g.st]&&usual[g.st]!==g.d)top.append(el("span","chip2 w","anderer Termin"));
+      const nr=el("span","","Nr. "+g.nr);nr.style.float="right";top.append(nr);
+      const teams=el("b","",g.h+" : "+g.g);teams.style.margin="4px 0 2px";
+      c.append(top,teams);
+      if(g.verl){const s=el("small","","statt "+wt(g.verl.d)+" · "+g.verl.z+" Uhr"+(g.verl.h?" – "+g.verl.h:""));c.append(s);}
+      const ort=ANS.addr[g.h];if(ort){const a=el("a","","Bahn: "+ort);a.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(ort);a.onclick=e=>e.stopPropagation();const s=el("small");s.append(a);c.append(s);}
+      if(me&&eig&&!istMein(g.h)&&isoD(g.d)>=heute){c.style.cursor="pointer";c.onclick=()=>zumSpiel(g);}
+      box.append(c);
+    });
+  });
+}
+// ---------- Verlegungen (vom Betreuer im Sheet gepflegt) ----------
+let VERL=[];
+function normD(s){s=(s||"").trim();let m=s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);
+  if(m)return m[1].padStart(2,"0")+"."+m[2].padStart(2,"0")+"."+(m[3].length===2?"20"+m[3]:m[3]);
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+"."+m[2]+"."+m[1]:"";}
+function normZ(s){const m=(s||"").trim().match(/^(\d{1,2}):(\d{2})/);return m?m[1].padStart(2,"0")+":"+m[2]:"";}
+function ladeVerl(){
+  if(DEMO){VERL=demoVerl();return;}
+  try{const t=lies("verl");VERL=t?parseCsv(t).map(r=>({nr:(r[0]||"").trim(),d:normD(r[1]),z:normZ(r[2]),h:(r[3]||"").trim()})).filter(v=>/^\d+$/.test(v.nr)&&(v.d||v.z)):[];}catch(e){VERL=[];}
+}
+function verlStatus(alle){
+  const e=$("verlStat");
+  if(DEMO){e.textContent="";return;}
+  if(!kv.get("verlUrl")){e.textContent="Verlegungen: kein Link hinterlegt (Lizenz-Blatt, Spalte N).";return;}
+  if(!VERL.length){e.textContent="Verlegungen: keine Einträge gefunden.";return;}
+  e.textContent="Verlegungen: "+VERL.length+(VERL.length===1?" Eintrag":" Einträge")+", "+alle.filter(g=>g.verl).length+" angewendet.";
+}
+async function holeVerl(){
+  if(DEMO)return;const u=kv.get("verlUrl");if(!u)return;
+  if(await hole(u,"verl")){ladeVerl();if(!$("vAns").hidden)renderAns();}
+}
+// Tipp auf ein kommendes Spiel: zur Aufstellung springen, Gegner und Heim/Auswärts übernehmen
+async function zumSpiel(g){
+  const e=normT(S&&S.team),istMein=n=>!!e&&(normT(n).includes(e)||e.includes(normT(n)));
+  const heim=istMein(g.h),gegner=heim?g.g:g.h,n=normL(gegner);
+  if(heim)return;
+  zeigeTab(0);
+  if($("gegner").options.length<2)await fuelleGegner();
+  const opt=[...$("gegner").options].filter(x=>x.value);
+  const o=opt.find(x=>normL(x.value)===n)||opt.find(x=>normL(x.value).includes(n)||n.includes(normL(x.value)));
+  $("res").textContent="";
+  if(!o){$("msg").textContent="„"+gegner+"“ ist in den Daten noch nicht vorhanden. Bitte den Gegner von Hand wählen.";return;}
+  $("msg").textContent="";$("gegner").value=o.value;await $("gegner").onchange();
+}
+document.querySelectorAll("input[name=ansf]").forEach(r=>r.onchange=renderAns);
+$("ansHol").onclick=async()=>{
+  $("ansHol").disabled=true;$("ansMsg").textContent="Rufe Ansetzungen ab …";
+  try{
+    if(DEMO)throw new Error("Im Demo-Modus nicht verfügbar.");
+    if(!A||!A.holePdf)throw new Error("Das geht nur in der installierten App.");
+    const teil=quelle("ansUrl",ANS_DEFAULT).split("#"),liga=(teil[1]||"").trim();
+    await new Promise((ok,err)=>{window.onPdf=r=>r?ok():err(new Error("PDF konnte nicht geladen werden (Internet, Link?)."));A.holePdf(fixHttp(teil[0]));});
+    await ladePdfJs();
+    const bin=atob(A.pdfBase64()),u8=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+    const pg=await seiten(u8);
+    const handbuch=!!liga||pg.flat().some(l=>l.some(i=>/Keglerverband Sachsen/.test(i.s)));
+    let r;
+    if(handbuch)r=parseAnsHandbuch(pg.flat(),liga,API.holeTeamsFuerWeb(),S&&S.team);
+    else{
+      if(pg.length<2)throw new Error("Die PDF hat nicht die erwarteten zwei Seiten.");
+      r=parseAns(pg[0],pg[1]);
+    }
+    if(!r.games.length)throw new Error(handbuch?(()=>{const b=API.holeTeamsFuerWeb();return "Im Handbuch wurde keine Staffel mit euren Mannschaften gefunden. Die App kennt in ihrer Datenbank "+(b.length?b.length+" Mannschaften, z. B. "+b.slice(0,3).join(", ")+". Ist das die richtige Liga? Sonst stimmt der Daten-Link in Spalte D nicht.":"noch keine Mannschaften. Lade die Daten mit ↻ neu.");})():"Auf Seite 2 wurden keine Ansetzungen gefunden.");
+    kv.set("ansLive",JSON.stringify({t:Date.now(),games:r.games,addr:r.addr}));ladeAns();
+    $("ansMsg").textContent=r.games.length+" Spiele geladen.";
+  }catch(e){$("ansMsg").textContent="Fehler: "+e.message;}
+  renderAns();
+};
+// ---------- Betreuer: Ergebnisse aus den Spieltag-PDFs (Keglerverband Sachsen) auslesen ----------
+//<SK
+function parseSachsen(pg){
+  const txt=l=>l.map(i=>i.s).join(" ").replace(/\s+/g," ").trim();
+  const lines=pg.flat().map(txt);
+  let st=0;
+  for(const t of lines){const m=t.match(/(\d+)\.\s*Spieltag/);if(m){st=+m[1];break;}}
+  const clubs=[];
+  for(const t of lines){const m=t.match(/^\d\s+(.+?)\s+\d+\s+[\d,]+\s*:\s*[\d,]+\s+\d+\s*:\s*\d+/);if(m&&!clubs.includes(m[1].trim()))clubs.push(m[1].trim());}
+  const games=[];let g=null,wait=false;
+  const drei=s=>/^\d{3}$/.test(s);
+  for(const t of lines){
+    if(t==="Klub Klub"){wait=true;continue;}
+    if(wait){
+      wait=false;const m=t.match(/^(.+?)\s+(\d+)(?:\s*:\s*|\s+)(\d+)\s+(.+)$/);
+      if(m){g={h:m[1].trim(),g:m[4].trim(),pp:[+m[2],+m[3]],duelle:[]};games.push(g);}
+      continue;
+    }
+    if(!g)continue;
+    if(/^Gesamt/.test(t)){g=null;continue;}
+    if(/^Name\s+Kegel/.test(t))continue;
+    const tok=t.split(" "),a=tok.findIndex(drei);let b=-1;
+    for(let k=tok.length-1;k>a;k--)if(drei(tok[k])){b=k;break;}
+    if(a<1||b<0||b===tok.length-1)continue;
+    const z=tok.slice(a+1,b);if(z.length<2||z.length>3)continue;
+    g.duelle.push({n1:tok.slice(0,a).join(" "),k1:+tok[a],n2:tok.slice(b+1).join(" "),k2:+tok[b],z});
+  }
+  const rows=[];
+  games.forEach(x=>{
+    if(!x.pp[0]&&!x.pp[1])return;                       // abgebrochen oder nicht gespielt
+    const key="S"+st+"|"+x.h+"|"+x.g;
+    x.duelle.forEach(d=>{
+      if(d.n1.includes("/")||d.n2.includes("/"))return;  // Einwechslung: Ergebnis keiner Person zuzuordnen
+      const n=d.z.map(v=>parseFloat(v.replace(",","."))),s1=n[0],s2=n[n.length-1];
+      const m1=s1!==s2?(s1>s2?1:0):(d.k1!==d.k2?(d.k1>d.k2?1:0):0.5);
+      rows.push([x.h,x.h,d.n1,d.k1,s1,m1,key],[x.g,x.h,d.n2,d.k2,s2,1-m1,key]);
+    });
+  });
+  const seeds=[];
+  for(let i=0;i<lines.length;i++){
+    let t=lines[i];
+    if(!/^\d+\.\s+\d+\.\s/.test(t))continue;
+    if(!clubs.some(c=>t.indexOf(c)>=0)&&i+1<lines.length&&clubs.some(c=>lines[i+1].startsWith(c)))t+=" "+lines[i+1];
+    const c=clubs.filter(x=>t.indexOf(x)>=0).sort((a,b)=>b.length-a.length)[0];
+    if(!c)continue;
+    const at=t.indexOf(c),name=t.slice(0,at).replace(/^\d+\.\s+\d+\.\s+(?:[AE]\s+)?/,"").trim();
+    const aw=parseInt(t.slice(at+c.length).trim().split(" ")[7]);   // Auswärtsschnitt der Vorsaison
+    if(name&&name!=="0"&&aw>0)seeds.push([c,"Vorjahr",name,aw,"","","START|"+name]);
+  }
+  return {st,rows,seeds,clubs};
+}
+//SK>
+// ---------- Frauenliga: Tabelle aus der Spieltag-PDF, Ansetzungen aus dem Handbuch ----------
+const normL=s=>normT(s).replace(/ii$/,"2");
+//<ST
+function parseSachsenTabelle(pg){
+  const lines=pg.flat().map(l=>l.map(i=>i.s).join(" ").replace(/\s+/g," ").trim());
+  let stand="";const out=[];
+  const Z="([\\d,]+)\\s*:\\s*([\\d,]+)",P="(\\d+)\\s*:\\s*(\\d+)";
+  const re=new RegExp("^(\\d)\\s+(.+?)\\s+(\\d+)\\s+"+[Z,P,Z,P,Z,P].join("\\s+"));
+  for(const t of lines){
+    const s=t.match(/(\d+)\.\s*Spieltag\s+(\d{2}\.\d{2}\.\d{4})/);if(s&&!stand)stand=s[1]+". Spieltag, "+s[2];
+    const m=t.match(re);
+    if(m)out.push([m[1],m[2].trim(),m[3],m[6]+":"+m[7],m[4]+":"+m[5],"",m[14]+":"+m[15],m[12]+":"+m[13],"",m[10]+":"+m[11],m[8]+":"+m[9],""]);
+  }
+  return out.map(r=>r.concat(stand));
+}
+//ST>
+//<ANH
+function parseAnsHandbuch(ls,liga,namen,eigen){
+  const lines=ls.map(l=>l.map(i=>i.s).join(" ").replace(/\s+/g," ").trim());
+  const norm=s=>s.toLowerCase().replace(/[^a-z0-9]/g,"").replace(/ii$/,"2");
+  const T0=new Set((namen||[]).map(norm));
+  const re=/^(\d+)\s+(\d{1,2}:\d{2})\s+(\d{2}\.\d{2}\.\d{4})\s+(.+?)\s+(\d{2}\.\d{2}\.\d{4})\s+(\d{1,2}:\d{2})\s+(\d+)$/;
+  // Adressblöcke: "<Titel> Ansetzung 2026/2027", je Mannschaft "Nr Name", "ML: ...", "Sportstätte: ..."
+  const bloecke=[];
+  for(let i=0;i<lines.length;i++){
+    const m0=lines[i].match(/^(.+?)\s+Ansetzung\s+\d{4}\/\d{4}$/);if(!m0)continue;
+    const bl={titel:m0[1].trim(),names:[],addr:{}};let team="";
+    for(let k=i+1;k<lines.length&&!/^Keglerverband Sachsen/.test(lines[k]);k++){
+      const t=lines[k];let x=t.match(/^\d{1,2}\s+(.+)$/);
+      if(x&&/^(ML:|Rückzug)/.test(lines[k+1]||"")){team=x[1].trim();if(!/^spielfrei$/i.test(team))bl.names.push(team);continue;}
+      x=t.match(/^Sportstätte:\s*(.+)$/);
+      if(x&&team){bl.addr[team]=x[1].trim();team="";}
+    }
+    bloecke.push(bl);
+  }
+  const abs=[];
+  for(let i=1;i<lines.length;i++)if(/(?:^|\s)1\.\s*Spieltag\s+\d+\.\s*Spieltag/.test(lines[i]))abs.push({titel:lines[i-1],start:i});
+  const lese=(start,T)=>{
+    const paar=s=>{
+      const q=s.split(" - ");
+      for(let k=1;k<q.length;k++){const a=q.slice(0,k).join(" - "),b=q.slice(k).join(" - ");if(T.has(norm(a))&&T.has(norm(b)))return [a.trim(),b.trim()];}
+      const k=Math.max(1,Math.floor(q.length/2));return [q.slice(0,k).join(" - ").trim(),q.slice(k).join(" - ").trim()];
+    };
+    const games=[];let sh=0,sr=0;
+    for(let i=start;i<lines.length;i++){
+      const t=lines[i];
+      if(/^Keglerverband Sachsen/.test(t))break;
+      let m=t.match(/(?:^|\s)(\d+)\.\s*Spieltag\s+(\d+)\.\s*Spieltag/);
+      if(m){sh=+m[1];sr=+m[2];continue;}
+      m=t.match(re);if(!m)continue;
+      const [h,g]=paar(m[4]);
+      games.push({nr:m[1],st:sh,d:m[3],z:m[2],h,g},{nr:m[7],st:sr,d:m[5],z:m[6],h:g,g:h});
+    }
+    return games;
+  };
+  const e=eigen?norm(eigen):"";
+  let best=null,punkte=-1;
+  for(const a of abs){
+    const bl=bloecke.find(x=>norm(x.titel)===norm(a.titel))||{names:[],addr:{}};
+    const T=new Set([...T0,...bl.names.map(norm)]);
+    if(liga){if(norm(a.titel)===norm(liga)){best={games:lese(a.start,T),bl};break;}continue;}
+    const eigenTreffer=!!e&&bl.names.some(n=>{const x=norm(n);return x.includes(e)||e.includes(x);});
+    const p=(eigenTreffer?100:0)+bl.names.filter(n=>T0.has(norm(n))).length;
+    if(p>punkte){punkte=p;best={games:lese(a.start,T),bl};}
+  }
+  if(!best||(!liga&&punkte<3))return {games:[],addr:{}};
+  return {games:best.games,addr:best.bl.addr};
+}
+//ANH>
+async function tabelleSachsen(){
+  const tpl=kv.get("ergUrl"),url=n=>fixHttp(tpl.replace("{nn}",String(n).padStart(2,"0")));
+  const lade=async n=>{
+    if(!await ladePdfOk(url(n)))return null;
+    const bin=atob(A.pdfBase64()),u8=new Uint8Array(bin.length);
+    for(let k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);
+    return seiten(u8);
+  };
+  await ladePdfJs();
+  const start=Math.max(1,parseInt(kv.get("lastSt"))||1);let letzter=null,nr=0;
+  for(let pass=0;pass<2&&!letzter;pass++)
+    for(let n=pass?1:start;n<=30;n++){const pg=await lade(n);if(!pg)break;letzter=pg;nr=n;}
+  if(!letzter)throw new Error("Die Spieltag-PDF konnte nicht geladen werden (Internet, Link?).");
+  kv.set("lastSt",String(nr));
+  const tb=parseSachsenTabelle(letzter);
+  if(!tb.length)throw new Error("In der PDF wurde keine Tabelle gefunden.");
+  return tb;
+}
+//<OKV
+const okvNum=s=>/^\d+(,\d+)?$/.test(s), okvFlag=s=>/^[A-Z]\d?$/.test(s);
+function okvSide(arr,left){
+  const n=arr.filter(i=>okvNum(i.s)).map(i=>i.s);
+  let nm=(arr.find(i=>i.s.includes(",")&&!okvNum(i.s))||{}).s, flag=(arr.find(i=>okvFlag(i.s))||{}).s||"";
+  if(!nm||n.length<2)return null;
+  const m=nm.match(/^(.*,.*?)\s+([A-Z](?:\s?\d+)?)$/); if(m){nm=m[1];flag=m[2].replace(/\s/g,"");}
+  nm=nm.replace(/\d+(?:[.,]\d+)?/g," ").replace(/\s+,/g,",").replace(/\s+/g," ").trim();
+  return {name:nm,holz:left?n[0]:n[n.length-1],sp:left?n[1]:n[n.length-2],mp:n.length>2?(left?n[2]:n[0]):"0",flag};
+}
+function okvParse(ls){
+  const games=[];let g=null;
+  for(const l of ls){
+    const txt=l.map(i=>i.s).join(" ");
+    let m=txt.match(/^Spiel-Nummer\s*:?\s*(\d+)/);
+    if(m){g={nr:m[1],cx:0,h:"",a:"",heim:[],gast:[],notes:{}};games.push(g);continue;}
+    if(!g)continue;
+    const c=l.find(i=>i.s===":");
+    if(c&&!g.h){g.cx=c.x;
+      g.h=l.filter(i=>i.x<c.x&&!okvNum(i.s)).map(i=>i.s).join(" ");
+      g.a=l.filter(i=>i.x>c.x&&!okvNum(i.s)).map(i=>i.s).join(" ");continue;}
+    if(/Wertungspunkte|^Ex\b|Staffelleiter/.test(txt))continue;
+    m=txt.match(/^([A-Z]\d?)\s*=\s*(.+)$/); if(m){g.notes[m[1]]=m[2];continue;}
+    const h=okvSide(l.filter(i=>i.x<g.cx),true),a=okvSide(l.filter(i=>i.x>g.cx),false);
+    if(h&&a){g.heim.push(h);g.gast.push(a);}
+  }
+  return games;
+}
+function okvRows(games,filter){
+  const f=filter.trim().toLowerCase(),out=[],nm=t=>t;
+  for(const g of games)
+    [[g.h,g.a,g.heim,g.gast],[g.a,g.h,g.gast,g.heim]].forEach(([team,gegner,P,Q])=>{
+      if(f&&!team.toLowerCase().includes(f))return;
+      P.forEach((p,i)=>{const q=Q[i],hint=p.flag?p.flag+(g.notes[p.flag]?": "+g.notes[p.flag]:""):"";
+        out.push([nm(team),nm(g.h),p.name,p.holz,p.sp,p.mp,g.nr,nm(gegner),q.name,q.holz,hint]);});
+    });
+  return out;
+}
+//OKV>
+const ladePdfOk=url=>new Promise(ok=>{window.onPdf=r=>ok(!!r);A.holePdf(url);});
+const postText=(url,body,tag)=>new Promise(res=>{
+  waitT[tag]=res;
+  if(A&&A.postText)A.postText(url,body,tag);else res({ok:false,t:""});
+});
+$("ergBtn").onclick=async()=>{
+  const m=$("ergMsg"),tpl=kv.get("ergUrl");
+  if(!A||!A.holePdf){m.textContent="Das geht nur in der installierten App.";return;}
+  if(!tpl){m.textContent="Für diesen Code ist keine Ergebnis-PDF hinterlegt (Lizenz-Blatt, Spalte Q).";return;}
+  $("ergBtn").disabled=true;
+  try{
+    if(tpl.indexOf("{nn}")<0){   // Männerliga: eine PDF mit allen Spielergebnissen
+      m.textContent="Bereite das Lesen von PDFs vor …";await ladePdfJs();
+      m.textContent="Lade die Spielergebnisse …";
+      if(!await ladePdfOk(fixHttp(tpl)))throw new Error("Die PDF konnte nicht geladen werden (Internet, Link?).");
+      const bin=atob(A.pdfBase64()),u8=new Uint8Array(bin.length);
+      for(let k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);
+      const pg=await seiten(u8);
+      const erg=pg.filter(s=>s.some(l=>l.map(i=>i.s).join(" ").trim()==="Spielergebnisse"));
+      const zeilen=okvRows(okvParse((erg.length?erg:pg).flat()),"");
+      const rows=zeilen.map(r=>[r[0],r[1],r[2],+r[3],+String(r[4]).replace(",","."),+String(r[5]).replace(",","."),"OKV|"+r[6]+"|"+r[1]+"|"+(r[0]===r[1]?r[7]:r[0])]);
+      if(!rows.length)throw new Error("In der PDF wurden keine Spielergebnisse gefunden.");
+      m.textContent=(rows.length/12)+" Spiele gelesen. Sende an den Server …";
+      const a=await postText(LIZENZ_URL,JSON.stringify({aktion:"ergebnisse",code:L.code,dev:geraeteId(),seeds:[],rows}),"ergsend");
+      let r;try{r=JSON.parse(a.t);}catch(e){r=null;}
+      if(!a.ok||!r)throw new Error("Keine Antwort vom Server.");
+      if(!r.ok)throw new Error(r.fehler||"Der Server hat die Daten abgelehnt.");
+      m.textContent="Fertig: "+r.spiele+" neue Spiele eingetragen ("+r.zeilen+" Zeilen). Google braucht bis zu 5 Minuten, dann lädst du mit ↻ die neuen Daten.";
+      $("ergBtn").disabled=false;return;
+    }
+    m.textContent="Bereite das Lesen von PDFs vor …";await ladePdfJs();
+    let rows=[],seeds=[],n=0;
+    for(let i=1;i<=30;i++){
+      m.textContent="Lese Spieltag "+i+" …";
+      if(!await ladePdfOk(fixHttp(tpl.replace("{nn}",String(i).padStart(2,"0")))))break;
+      const bin=atob(A.pdfBase64()),u8=new Uint8Array(bin.length);
+      for(let k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);
+      const r=parseSachsen(await seiten(u8));
+      rows=rows.concat(r.rows);if(r.seeds.length)seeds=r.seeds;n++;
+    }
+    if(!n)throw new Error("Es konnte kein Spieltag geladen werden (Internet, Link?).");
+    kv.set("lastSt",String(n));
+    m.textContent=n+" Spieltage gelesen. Sende an den Server …";
+    const a=await postText(LIZENZ_URL,JSON.stringify({aktion:"ergebnisse",code:L.code,dev:geraeteId(),seeds,rows}),"ergsend");
+    let r;try{r=JSON.parse(a.t);}catch(e){r=null;}
+    if(!a.ok||!r)throw new Error("Keine Antwort vom Server.");
+    if(!r.ok)throw new Error(r.fehler||"Der Server hat die Daten abgelehnt.");
+    m.textContent="Fertig: "+r.spiele+" neue Spiele"+(r.startwerte?" und "+r.startwerte+" Startwerte":"")+" eingetragen ("+r.zeilen+" Zeilen, "+n+" Spieltage gelesen). Google braucht bis zu 5 Minuten, dann lädst du mit ↻ die neuen Daten.";
+  }catch(e){m.textContent="Fehler: "+e.message;}
+  $("ergBtn").disabled=false;
+};
+// ---------- Betreuer: Verlegungen eintragen ----------
+function fuelleVl(){
+  const s=$("vlSpiel");s.textContent="";
+  const e=normL(S&&S.team),istMein=n=>!!e&&(normL(n).includes(e)||e.includes(normL(n)));
+  const meins=ANS.games.filter(g=>istMein(g.h)||istMein(g.g)).sort((a,b)=>isoD(a.d).localeCompare(isoD(b.d))||(+a.nr)-(+b.nr));
+  if(!meins.length){const o=el("option","","Erst unter „Ansetzungen“ abrufen");o.value="";s.append(o);return;}
+  const vm={};VERL.forEach(v=>{vm[String(+v.nr)]=v;});
+  meins.forEach(g=>{const o=el("option","","Nr "+g.nr+" · "+g.d.slice(0,6)+" "+g.z+" · "+g.h+" : "+g.g+(vm[String(+g.nr)]?" (verlegt)":""));o.value=g.nr;s.append(o);});
+  vlVorbelegen();
+}
+function vlVorbelegen(){
+  const nr=$("vlSpiel").value,g=ANS.games.find(x=>x.nr===nr);if(!g)return;
+  const v=VERL.find(x=>String(+x.nr)===String(+nr));
+  $("vlDatum").value=((v&&v.d)||g.d).split(".").reverse().join("-");
+  $("vlZeit").value=(v&&v.z)||g.z;$("vlHinweis").value=v?v.h:"";
+}
+$("vlSpiel").onchange=vlVorbelegen;
+async function vlSenden(loeschen){
+  const m=$("vlMsg"),nr=$("vlSpiel").value;
+  if(!nr){m.textContent="Bitte zuerst unter „Ansetzungen“ die Ansetzungen abrufen.";return;}
+  const iso=$("vlDatum").value,z=$("vlZeit").value,h=$("vlHinweis").value.trim();
+  if(!loeschen&&!iso&&!z){m.textContent="Bitte neues Datum oder neue Uhrzeit angeben.";return;}
+  const d=iso?iso.split("-").reverse().join("."):"";
+  m.textContent="Sende …";$("vlSave").disabled=$("vlDel").disabled=true;
+  const a=await postText(LIZENZ_URL,JSON.stringify({aktion:"verlegung",code:L.code,dev:geraeteId(),nr,d,z,h,loeschen:!!loeschen}),"vlsend");
+  let r;try{r=JSON.parse(a.t);}catch(e){r=null;}
+  $("vlSave").disabled=$("vlDel").disabled=false;
+  if(!a.ok||!r){m.textContent="Keine Antwort vom Server.";return;}
+  if(!r.ok){m.textContent="Fehler: "+(r.fehler||"abgelehnt");return;}
+  VERL=VERL.filter(v=>String(+v.nr)!==String(+nr));
+  if(!loeschen)VERL.push({nr,d:normD(d),z:normZ(z),h});
+  fuelleVl();$("vlSpiel").value=nr;vlVorbelegen();
+  m.textContent=(loeschen?"Verlegung gelöscht.":"Verlegung gespeichert.")+" Alle anderen sehen sie, sobald Google die Tabelle aktualisiert hat (bis zu 5 Minuten).";
+}
+$("vlSave").onclick=()=>vlSenden(false);$("vlDel").onclick=()=>vlSenden(true);
+// ---------- Update-Hinweis ----------
+function meineVersion(){const m=((A&&A.version)?A.version():"").match(/\((\d+)\)/);return m?+m[1]:0;}
+function zeigeUpdate(n){
+  const neu=!!(n&&+n.code>meineVersion()&&meineVersion()>0);
+  $("updBar").hidden=!neu;
+  $("updInfo").textContent=neu?"Neue Version verfügbar: "+(n.name||n.code)+(n.text?" – "+n.text:""):"";
+  if(neu)$("updTxt").textContent="Version "+(n.name||n.code)+" ist verfügbar"+(n.text?": "+n.text:"");
+}
+$("updNow").onclick=()=>{
+  if(!A||!A.appUpdate)return;
+  $("updBarMsg").textContent="Starte …";A.appUpdate(kv.get("updUrl")||UPD_DEFAULT);
+};
+// ---------- Freischaltung ----------
+const waitT={};
+window.onText=(tag,ok,t)=>{const f=waitT[tag];if(f){delete waitT[tag];f({ok,t});}};
+function holeText(url,tag){
+  return new Promise(res=>{
+    waitT[tag]=res;
+    if(A&&A.holeText)A.holeText(url,tag);
+    else fetch(url).then(r=>r.text()).then(t=>window.onText(tag,true,t)).catch(()=>window.onText(tag,false,""));
+  });
+}
+function geraeteId(){
+  let g=kv.get("gid");
+  if(!g){const a=new Uint8Array(12);crypto.getRandomValues(a);g=Array.from(a,x=>x.toString(16).padStart(2,"0")).join("");kv.set("gid",g);}
+  return g;
+}
+async function pruefeCode(code){
+  if(!LIZENZ_URL||LIZENZ_URL.startsWith("HIER"))return{ok:false,fehler:"In dieser App ist die Lizenzadresse noch nicht eingetragen (config.js)."};
+  const r=await holeText(LIZENZ_URL+"?code="+encodeURIComponent(code)+"&v="+encodeURIComponent(A&&A.version?A.version():"")+"&dev="+encodeURIComponent(geraeteId()),"liz");
+  if(!r.ok)return{ok:false,netz:true,fehler:"Keine Verbindung oder falsche Adresse. Bitte Internet prüfen."};
+  try{return JSON.parse(r.t);}catch(e){return{ok:false,netz:true,fehler:"Unerwartete Antwort vom Server."};}
+}
+function zeigeGate(msg){
+  $("setup").hidden=true;$("plan").hidden=true;$("gate").hidden=false;document.body.className="";
+  $("gateMsg").textContent=msg||"";$("gateGo").disabled=false;window.scrollTo(0,0);
+}
+$("gateGo").onclick=async()=>{
+  const code=$("code").value.trim().toUpperCase();
+  if(!code){$("gateMsg").textContent="Bitte Code eingeben.";return;}
+  $("gateGo").disabled=true;$("gateMsg").textContent="Prüfe …";
+  const r=await pruefeCode(code);
+  if(!r.ok){$("gateMsg").textContent=r.fehler||"Code ungültig.";$("gateGo").disabled=false;return;}
+  const c=r.cfg||{},gleich=!DEMO&&S&&S.url&&S.url===c.url;
+  if(!gleich){if(A&&A.leeren)A.leeren();kv.set("tabLive","");}
+  S=gleich?S:{url:"",url2:"",team:c.team||"",kader:[]};
+  S.url=c.url||"";S.url2=c.url2||"";DEMO=false;save();
+  kv.set("pdfUrl",c.pdf||(c.erg&&c.erg.indexOf("{nn}")>=0?"-":PDF_DEFAULT));kv.set("ansUrl",c.ans||(c.erg&&c.erg.indexOf("{nn}")>=0?"-":""));kv.set("verlUrl",c.verl||"");kv.set("ergUrl",c.erg||"");kv.set("admin",r.admin?"1":"");kv.set("updUrl",c.upd||"");kv.set("demo","");
+  L={code,name:r.name||""};kv.set("lizenz",JSON.stringify(L));
+  document.body.className="mode-lic";
+  $("gateMsg").textContent="Lade Daten …";
+  const ok=S.url?await aktualisiere(S.url):false;
+  if(S.url2)await aktualisiereTab(S.url2);
+  ladeCache();ladeTabelle();
+  if(!ok){$("gateMsg").textContent="Freigeschaltet, aber die Daten konnten nicht geladen werden. Du kannst später mit ↻ aktualisieren.";}
+  zeigeSetup();
+};
+function startDemo(){
+  DEMO=true;kv.set("demo","1");S={demo:true,team:"Demo Kegler 1",kader:[]};
+  ladeCache();ladeTabelle();ladeAns();S.kader=API.holeSpielerFuerTeam("Demo Kegler 1");
+  zeigePlan();
+}
+$("demoGo").onclick=startDemo;
+$("toGate").onclick=()=>zeigeGate();$("demoCode").onclick=()=>zeigeGate();
+$("lizOut").onclick=()=>{
+  if(A&&A.leeren)A.leeren();
+  ["lizenz","settings","tabLive","pdfUrl","demo","ansLive","ansUrl","verlUrl","ergUrl","admin"].forEach(k=>kv.set(k,""));
+  L=null;S=null;DB=[];TAB=[];DEMO=false;zeigeGate();
+};
+async function revalidiere(){
+  const r=await pruefeCode(L.code);
+  if(r.netz)return;   // offline: weiterarbeiten
+  if(!r.ok){
+    if(A&&A.leeren)A.leeren();
+    ["lizenz","settings","tabLive","pdfUrl","ansLive","ansUrl","verlUrl","ergUrl","admin"].forEach(k=>kv.set(k,""));
+    L=null;S=null;DB=[];TAB=[];zeigeGate("Lizenz: "+(r.fehler||"ungültig"));return;
+  }
+  zeigeUpdate(r.neu);
+  const c=r.cfg||{};
+  if(S&&((c.url&&c.url!==S.url)||(c.url2||"")!==(S.url2||""))){S.url=c.url||S.url;S.url2=c.url2||"";save();}
+  kv.set("pdfUrl",c.pdf||(c.erg&&c.erg.indexOf("{nn}")>=0?"-":PDF_DEFAULT));kv.set("ansUrl",c.ans||(c.erg&&c.erg.indexOf("{nn}")>=0?"-":""));kv.set("verlUrl",c.verl||"");kv.set("ergUrl",c.erg||"");kv.set("admin",r.admin?"1":"");
+}
+$("dataRetry").onclick=async()=>{
+  if(!S||!S.url){$("dataMsg").textContent="Für diesen Code ist kein Daten-Link hinterlegt. Bitte beim Anbieter melden.";return;}
+  $("dataRetry").disabled=true;$("dataMsg").textContent="Lade …";
+  const ok=await aktualisiere(S.url);if(S.url2)await aktualisiereTab(S.url2);
+  $("dataRetry").disabled=false;
+  if(!ok){$("dataMsg").textContent="Die Daten konnten nicht geladen werden. Der Link muss auf die veröffentlichte CSV-Datei zeigen (endet auf output=csv). Internet prüfen. Er beginnt mit: "+S.url.slice(0,70)+"…";return;}
+  await zeigeSetup();
+};
+try{L=JSON.parse(kv.get("lizenz")||"null");}catch(e){L=null;}
+if(L&&L.code){
+  document.body.className="mode-lic";ladeCache();ladeTabelle();ladeAns();
+  if(S&&S.url&&S.team&&S.kader&&S.kader.length>=6&&DB.length>1)zeigePlan();else zeigeSetup();
+  revalidiere();
+}else if(kv.get("demo")==="1")startDemo();
+else zeigeGate();
+</script></body></html>
